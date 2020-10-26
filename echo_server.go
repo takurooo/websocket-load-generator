@@ -30,19 +30,19 @@ func echo(w http.ResponseWriter, r *http.Request) {
 
 	clientAddr := c.RemoteAddr()
 	log.Println("client:", clientAddr.Network(), clientAddr.String())
-L:
+
 	for {
 		mt, message, err := c.ReadMessage()
 		if err != nil {
 			log.Println("read:", err)
-			break L
+			return
 		}
 		log.Printf("recv: [%s] %s", type2str[mt], message)
 
 		err = c.WriteMessage(mt, message)
 		if err != nil {
 			log.Println("write:", err)
-			break L
+			return
 		}
 	}
 }

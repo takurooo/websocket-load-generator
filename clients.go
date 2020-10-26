@@ -50,12 +50,21 @@ func clinet(config Config) {
 
 	for {
 		select {
-		case t := <-ticker.C:
-			log.Println(config.id, t.String())
+		case <-ticker.C:
+			// log.Println(config.id, t.String())
+			start := time.Now()
 			if err := c.WriteMessage(websocket.TextMessage, []byte(message)); err != nil {
 				log.Println("write:", err)
 				return
 			}
+			_, _, err := c.ReadMessage()
+			if err != nil {
+				log.Println("read:", err)
+				return
+			}
+			elapsedTime := time.Now().Sub(start)
+			log.Println("id:", config.id, "rtt", elapsedTime.String())
+
 		case <-config.done:
 			closeMessage := websocket.FormatCloseMessage(websocket.CloseNormalClosure, fmt.Sprint(config.id))
 			if err := c.WriteMessage(websocket.CloseMessage, closeMessage); err != nil {
